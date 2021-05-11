@@ -3,7 +3,7 @@ defmodule OneMax do
 
   @behaviour Genetic.Problem
 
-  alias Genetic.Chromosome
+  alias Genetic.{Chromosome, Genotype}
 
   @size 42
 
@@ -14,12 +14,12 @@ defmodule OneMax do
 
   @impl true
   def genotype do
-    %Chromosome{genes: for(_ <- 1..@size, do: Enum.random(0..1)), size: @size}
+    %Chromosome{genes: Genotype.binary(@size), size: @size}
   end
 
   @impl true
-  def terminate?(_population, generation) do
-    generation == 100
+  def terminate?([best | _], generation) do
+    best.fitness == @size or generation == 100
   end
 end
 

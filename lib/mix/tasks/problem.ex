@@ -14,21 +14,21 @@ defmodule Mix.Tasks.Problem do
 
       @behaviour Genetic.Problem
 
-      alias Genetic.Chromosome
+      alias Genetic.{Chromosome, Problem}
 
-      @impl true
+      @impl Problem
       def genotype do
         # Replace
         %Chromosome{}
       end
 
-      @impl true
+      @impl Problem
       def fitness_function(chromosome) do
         # Replace
         0
       end
 
-      @impl true
+      @impl Problem
       def terminate?(population, generation) do
         # Replace
         true

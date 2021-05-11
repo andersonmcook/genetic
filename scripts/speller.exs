@@ -25,10 +25,10 @@ defmodule Speller do
   end
 
   @impl true
-  def terminate?(population, generation) do
-    # hd(population).fitness == 1.0
-    # Enum.max_by(population, &fitness_function/1).fitness == 1.0
-    generation == 1000
+  def terminate?([best | _], generation) do
+    # As the target grows, so does the generations needed to find the best fit
+    # A 7 character string already takes more than 1000 generations.
+    best.fitness === 1.0 or generation == 1000
   end
 end
 

@@ -9,6 +9,7 @@ defmodule Cargo do
   @profits [6, 5, 8, 9, 6, 7, 3, 1, 2, 6]
   @weights [10, 6, 8, 7, 10, 9, 7, 11, 6, 8]
   @weight_limit 40
+  @max_profit 53
 
   @impl true
   def genotype do
@@ -35,8 +36,9 @@ defmodule Cargo do
   end
 
   @impl true
-  def terminate?(_population, generation) do
-    generation == 1000
+  def terminate?(population, generation) do
+    Enum.max_by(population, &fitness_function/1).fitness == @max_profit or
+      generation == 5000
   end
 end
 

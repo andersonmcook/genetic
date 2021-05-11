@@ -3,25 +3,28 @@ defmodule OneMaxInteractive do
 
   @behaviour Genetic.Problem
 
-  alias Genetic.Chromosome
+  alias Genetic.{Chromosome, Genotype}
+
+  @size 42
 
   @impl true
   def genotype do
-    %Chromosome{genes: for(_ <- 1..@size, do: Enum.random(0..1)), size: @size}
+    %Chromosome{genes: Genotype.binary(@size), size: @size}
   end
 
   @impl true
   def fitness_function(chromosome) do
     IO.inspect(chromosome)
 
-    "Rate from 1 to 10"
-    |> IO.get()
+    "Rate from 1 to 10\n"
+    |> IO.gets()
+    |> String.trim()
     |> String.to_integer()
   end
 
   @impl true
-  def terminate?(_population, generation) do
-    generation == 10
+  def terminate?([best | _], generation) do
+    best.fitness == 10 or generation == 10
   end
 end
 

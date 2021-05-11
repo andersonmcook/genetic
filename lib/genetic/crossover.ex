@@ -4,8 +4,6 @@ defmodule Genetic.Crossover do
   Parents will combine to make stronger children.
   """
 
-  alias Genetic.Chromosome
-
   @doc """
   Simple, but does a poor job producing stronger solutions.
   Won't maintain the integrity of a permutation.
