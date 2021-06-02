@@ -1,13 +1,15 @@
 defmodule Genetic do
   @moduledoc false
 
+  require Integer
+
   alias Genetic.{Crossover, Selection}
 
   @defaults %{
     crossover_type: &Crossover.single_point/2,
     population_size: 100,
     selection_rate: 0.8,
-    selection_type: &Selection.natural/2
+    selection_type: &Selection.elite/2
   }
 
   def run(problem, opts \\ []) do
@@ -29,10 +31,11 @@ defmodule Genetic do
   end
 
   defp select(population, selection_rate, selection_type) do
+    # Number of parents
     n = round(length(population) * selection_rate)
 
     # Ensure even number of parents
-    n = if rem(n, 2) == 0, do: n, else: n + 1
+    n = if Integer.is_even(n), do: n, else: n + 1
 
     parents = selection_type.(population, n)
 

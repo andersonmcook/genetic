@@ -1,11 +1,23 @@
 defmodule Genetic.Selection do
   @moduledoc false
 
-  defdelegate natural(population, n), to: Enum, as: :take
+  @doc """
+  Choose the best `n` chromosomes to reproduce.
+
+  Can lead to premature convergence.
+  """
+  defdelegate elite(population, n), to: Enum, as: :take
+
+  @doc """
+  Choose random chromosomes to reproduce.
+  """
   defdelegate random(population, n), to: Enum, as: :take_random
 
+  @doc """
+  Choose random chromosomes and select the strongest.
+  """
   def tournament(population, n, size) do
-    Enum.map(0..(n - 1), fn _ ->
+    Enum.map(1..n, fn _ ->
       population
       |> Enum.take_random(size)
       |> Enum.max_by(& &1.fitness)
@@ -28,7 +40,7 @@ defmodule Genetic.Selection do
   def roulette(population, n) do
     sum_fitness = Enum.reduce(population, 0, fn curr, acc -> acc + curr.fitness end)
 
-    Enum.map(0..(n - 1), fn _ ->
+    Enum.map(1..n, fn _ ->
       u = :rand.uniform() * sum_fitness
 
       Enum.reduce_while(population, 0, fn curr, acc ->
