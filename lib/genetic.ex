@@ -3,12 +3,12 @@ defmodule Genetic do
 
   require Integer
 
-  alias Genetic.{Crossover, Mutation, Selection}
+  alias Genetic.{Crossover, Mutation, Population, Selection}
 
   @defaults %{
     crossover_type: &Crossover.single_point/2,
     mutation_rate: 0.05,
-    mutation_type: &Mutation.flip/1,
+    mutation_type: &Mutation.scramble/1,
     population_size: 100,
     selection_rate: 0.8,
     selection_type: &Selection.elite/2
@@ -17,13 +17,9 @@ defmodule Genetic do
   def run(problem, opts \\ []) do
     opts = Map.new(@defaults, fn {key, value} -> {key, Keyword.get(opts, key, value)} end)
 
-    (&problem.genotype/0)
-    |> initialize(opts.population_size)
+    opts.population_size
+    |> Population.populate(&problem.genotype/0)
     |> evolve(problem, 0, opts)
-  end
-
-  defp initialize(genotype, population_size) do
-    Enum.map(1..population_size, fn _ -> genotype.() end)
   end
 
   defp evaluate(population, fitness_function) do
