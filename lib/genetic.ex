@@ -3,10 +3,12 @@ defmodule Genetic do
 
   require Integer
 
-  alias Genetic.{Crossover, Selection}
+  alias Genetic.{Crossover, Mutation, Selection}
 
   @defaults %{
     crossover_type: &Crossover.single_point/2,
+    mutation_rate: 0.05,
+    mutation_type: &Mutation.flip/1,
     population_size: 100,
     selection_rate: 0.8,
     selection_type: &Selection.elite/2
@@ -17,7 +19,7 @@ defmodule Genetic do
 
     (&problem.genotype/0)
     |> initialize(opts.population_size)
-    |> evolve(problem, 0, opts.crossover_type, opts.selection_rate, opts.selection_type)
+    |> evolve(problem, 0, opts)
   end
 
   defp initialize(genotype, population_size) do
@@ -60,19 +62,19 @@ defmodule Genetic do
     end)
   end
 
-  defp mutation(population) do
-    Enum.map(population, &mutate/1)
-  end
-
-  defp mutate(chromosome) do
-    if :rand.uniform() < 0.05 do
-      %{chromosome | genes: Enum.shuffle(chromosome.genes)}
+  defp mutate(chromosome, opts) do
+    if :rand.uniform() < opts.mutation_rate do
+      Map.update!(chromosome, :genes, opts.mutation_type)
     else
       chromosome
     end
   end
 
-  defp evolve(population, problem, generation, crossover_type, selection_rate, selection_type) do
+  defp mutation(population, opts) do
+    Enum.map(population, &mutate(&1, opts))
+  end
+
+  defp evolve(population, problem, generation, opts) do
     [best | _] = population = evaluate(population, &problem.fitness_function/1)
 
     IO.puts("Current Best: #{best.fitness}")
@@ -80,13 +82,13 @@ defmodule Genetic do
     if problem.terminate?(population, generation) do
       best
     else
-      {parents, leftover} = select(population, selection_rate, selection_type)
+      {parents, leftover} = select(population, opts.selection_rate, opts.selection_type)
 
-      children = crossover(parents, crossover_type)
+      children = crossover(parents, opts.crossover_type)
 
       (children ++ leftover)
-      |> mutation()
-      |> evolve(problem, generation + 1, crossover_type, selection_rate, selection_type)
+      |> mutation(opts)
+      |> evolve(problem, generation + 1, opts)
     end
   end
 end

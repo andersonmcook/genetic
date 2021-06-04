@@ -11,7 +11,9 @@ defmodule Genetic.Crossover do
   Only useful for basic problems, prototyping, or benchmarking.
   """
   def single_point(p1, p2) do
-    cx_point = :rand.uniform(p1.size)
+    # :rand.uniform returns a number between 1 and n
+    # and we want a number between 0 and n-1
+    cx_point = :rand.uniform(p1.size) - 1
 
     {p1_head, p1_tail} = Enum.split(p1.genes, cx_point)
     {p2_head, p2_tail} = Enum.split(p2.genes, cx_point)
@@ -27,10 +29,7 @@ defmodule Genetic.Crossover do
   def order_one(p1, p2) do
     limit = Enum.count(p1.genes) - 1
     # Get random range
-    {i1, i2} =
-      [:rand.uniform(limit), :rand.uniform(limit)]
-      |> Enum.sort()
-      |> List.to_tuple()
+    [i1, i2] = Enum.sort([:rand.uniform(limit), :rand.uniform(limit)])
 
     # p2 contribution
     slice1 = Enum.slice(p1.genes, i1..i2)
@@ -39,7 +38,7 @@ defmodule Genetic.Crossover do
     {head1, tail1} = Enum.split(p2_contribution, i1)
 
     # p1 contribution
-    slice2 = Enum.slice(p1.genes, i1..i2)
+    slice2 = Enum.slice(p2.genes, i1..i2)
     slice2_set = MapSet.new(slice2)
     p1_contribution = Enum.reject(p1.genes, &MapSet.member?(slice2_set, &1))
     {head2, tail2} = Enum.split(p1_contribution, i1)
